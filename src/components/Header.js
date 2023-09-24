@@ -1,36 +1,86 @@
-import React from "react";
+import  { useEffect } from "react";
 import { auth } from "../utils/fireBase";
-import { signOut } from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { addUser, removeUser } from "../utils/userSlice";
+import { LOGO, SUPPORTED_LANGUAGE } from "../utils/constants";
+import { toggleGptSearchView } from "../utils/gptSearchSlice";
+import { changeLanguage } from "../utils/configSlice";
 
 const Header = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const user = useSelector((store) => store.user);
+  const showGptSearch = useSelector((store) => store.gpt.showGptSearch);
 
-  const navigate=useNavigate()
+  const handleSingOut = () => {
+    signOut(auth)
+      .then(() => {})
+      .catch((error) => {
+        navigate("/error");
+      });
+  };
 
-  const handleSingOut=()=>{
-    signOut(auth).then(() => {
-      navigate("/")
-    }).catch((error) => {
-       navigate("/error")
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const { uid, email, displayName, photoURL } = user;
+        dispatch(
+          addUser({
+            uid: uid,
+            email: email,
+            displayName: displayName,
+            photoURL: photoURL,
+          })
+        );
+        navigate("/browse");
+      } else {
+        dispatch(removeUser());
+        navigate("/");
+      }
     });
-    
-  }
+    // unsubscribe when component unmount
+    return () => unsubscribe();
+  }, []);
+
+  const handleGptSearch = () => {
+    dispatch(toggleGptSearchView());
+  };
+  const handleLangChange = (e) => {
+    dispatch(changeLanguage(e.target.value));
+  };
 
   return (
     <div className="absolute w-screen px-8 py-2 bg-gradient-to-b from-black z-10 flex justify-between">
-      <img
-        className="w-44 "
-        src="https://cdn.cookielaw.org/logos/dd6b162f-1a32-456a-9cfe-897231c7763c/4345ea78-053c-46d2-b11e-09adaef973dc/Netflix_Logo_PMS.png"
-        alt="logo"
-      />
-      <div className="flex p-2">
-        <img
-        className="w-12 h-12"
-          alt="userIcon"
-          src="https://occ-0-4345-3647.1.nflxso.net/dnm/api/v6/K6hjPJd6cR6FpVELC5Pd6ovHRSk/AAAABWtYstzFdHB5VDwg1wo0AtmxHp1wtiHQt6kfVzqrLag-FyrhJSX1Suc-w_56yVQPsLfndT57n9KLPVZ-PMVtsUAKpA3TZ6M.png?r=72f"
-        />
-        <button  onClick={handleSingOut} className="font-bolt text-white">(Sign Out)</button>
-      </div>
+      <img className="w-44 " src={LOGO} alt="logo" />
+      {user && (
+        <div className="flex p-2">
+          {showGptSearch && (
+            <select
+              className="p-2 m-2 bg-gray-900 text-white"
+              onChange={handleLangChange}
+            >
+              {SUPPORTED_LANGUAGE.map((lang) => (
+                <option key={lang.identifiers} value={lang.identifiers}>
+                  {lang.name}
+                </option>
+              ))}
+            </select>
+          )}
+          <button
+            className="py-2 px-4 mx-4 my-2 bg-purple-800 rounded-lg text-white"
+            onClick={handleGptSearch}
+          >
+           {showGptSearch ? "Go To homePage": "Go To GPT Search"}
+          </button>
+          <img className="w-12 h-12" alt="userIcon" src={user?.photoURL} />
+          <button onClick={handleSingOut} className="font-bolt text-white">
+            <h1 className="text-white ">{user.displayName}</h1>
+            (Sign Out)
+          </button>
+        </div>
+      )}
     </div>
   );
 };

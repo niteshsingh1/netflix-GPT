@@ -11,6 +11,9 @@
 # production
 /build
 
+#openAIkey
+/utils/constants.js
+
 # misc
 .DS_Store
 .env.local

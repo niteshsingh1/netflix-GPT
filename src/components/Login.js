@@ -4,44 +4,58 @@ import { checkValidData } from "../utils/validate";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
 import { auth } from "../utils/fireBase";
-import {  useNavigate } from "react-router-dom";
-
+import { useDispatch } from "react-redux";
+import { addUser } from "../utils/userSlice";
+import { BACKGROUND_IMG, USER_AVATAR } from "../utils/constants";
 
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
 
-  const navigate=useNavigate();
+  const dispatch = useDispatch();
 
-  // const name=useRef(null);
+  const name = useRef(null);
   const email = useRef(null);
   const password = useRef(null);
 
-
-
-  const handleButtonClick =async (e) => {
-    let message = checkValidData(e.email?.current?.value, e.password?.current?.value);
-    message = true  
-    // console.log("message:::::::",message);
-    // console.log("e:::::::",e);
+  const handleButtonClick = () => {
+    let message = checkValidData(email.current.value, password.current.value);
     setErrorMessage(message);
 
     if (message) return;
 
-    if (!message) {
+    if (!isSignInForm) {
+      // Sign Up
       createUserWithEmailAndPassword(
         auth,
         email.current.value,
-        password.current.value,
-
+        password.current.value
       )
         .then((userCredential) => {
           const user = userCredential.user;
-          console.log(user);
-          navigate("/browse")
-
+          updateProfile(user, {
+            displayName: name.current.value,
+            photoURL: USER_AVATAR,
+          })
+            .then(() => {
+              // Profile updated!
+              const { uid, email, displayName, photoURL } = auth.currentUser;
+              dispatch(
+                addUser({
+                  uid: uid,
+                  email: email,
+                  displayName: displayName,
+                  photoURL: photoURL,
+                })
+              );
+            })
+            .catch((error) => {
+              // An error occurred
+              setErrorMessage(error.message);
+            });
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -49,29 +63,23 @@ const Login = () => {
           setErrorMessage(errorCode + "-" + errorMessage);
         });
     } else {
-      await signInWithEmailAndPassword(
+      // Sign In Logic
+      signInWithEmailAndPassword(
         auth,
         email.current.value,
         password.current.value
       )
         .then((userCredential) => {
-          console.log("userCredential", userCredential)
+          // setUserName = userCredential.user.displayName;
           const user = userCredential.user;
-          console.log(user)
-          navigate("/browse")
         })
         .catch((error) => {
-          console.log("eoror::::::",error)
           const errorCode = error.code;
           const errorMessage = error.message;
-          setErrorMessage(errorCode+" "+errorMessage)
+          setErrorMessage(errorCode + " " + errorMessage);
         });
     }
   };
-
-
-
-
 
   const toggleSignInForm = () => {
     setIsSignInForm(!isSignInForm);
@@ -80,10 +88,7 @@ const Login = () => {
     <div>
       <Header />
       <div className="absolute">
-        <img
-          src="https://assets.nflxext.com/ffe/siteui/vlv3/855ed6e2-d9f1-4afd-90da-96023ec747c3/85eb5b91-25ed-4965-ace9-ba8e4a0ead8d/IN-en-20230828-popsignuptwoweeks-perspective_alpha_website_large.jpg"
-          alt="logo"
-        />
+        <img src={BACKGROUND_IMG} alt="BackGround_Img" />
       </div>
       <form
         onSubmit={(e) => e.preventDefault()}
@@ -94,7 +99,7 @@ const Login = () => {
         </h1>
         {!isSignInForm && (
           <input
-            // ref={name}
+            ref={name}
             type="text"
             placeholder="Full Name"
             className="p-4 my-4 w-full bg-gray-700"
@@ -116,7 +121,7 @@ const Login = () => {
         <p className="text-red-500 font-bold text-lg py-2">{errorMessage}</p>
         <button
           className="p-4 my-6 bg-red-700 w-full rounded-lg"
-          onClick={(e)=>handleButtonClick(e)}
+          onClick={(e) => handleButtonClick(e)}
         >
           {isSignInForm ? "Sign In" : "Sign Up"}
         </button>
