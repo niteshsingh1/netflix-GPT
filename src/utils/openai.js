@@ -1,8 +1,11 @@
 import OpenAI from 'openai';
-import { KEY_FOR_DATA } from './constants';
+// import dotenv from 'dotenv'
+import {  OPEN_AI_KEY } from './constants';
+
+
 
 const openai = new OpenAI({
-  apiKey: KEY_FOR_DATA, 
+  apiKey: OPEN_AI_KEY, 
   dangerouslyAllowBrowser: true 
 });
 

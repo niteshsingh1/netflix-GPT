@@ -2,9 +2,9 @@ import React from "react";
 import { useSelector } from "react-redux";
 import MovieList from "./MovieList";
 
-const GptmoviesSuggestion = () => {
+const GptMoviesSuggestion = () => {
   const { movieNames, movieResults } = useSelector((store) => store.gpt);
-  if (!movieNames) return <h1>Loading...</h1>;
+  if (!movieNames) return null;
 
   return (
     <div className="p-4 m-4 bg-black text-white bg-opacity-80">
@@ -15,4 +15,4 @@ const GptmoviesSuggestion = () => {
   );
 };
 
-export default GptmoviesSuggestion;
+export default GptMoviesSuggestion;

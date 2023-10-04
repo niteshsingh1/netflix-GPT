@@ -1,17 +1,19 @@
+// import dotenv from 'dotenv'
+// dotenv.config()
 export const LOGO =
   "https://cdn.cookielaw.org/logos/dd6b162f-1a32-456a-9cfe-897231c7763c/4345ea78-053c-46d2-b11e-09adaef973dc/Netflix_Logo_PMS.png";
 
 export const USER_AVATAR =
   "https://occ-0-4345-3647.1.nflxso.net/dnm/api/v6/K6hjPJd6cR6FpVELC5Pd6ovHRSk/AAAABWtYstzFdHB5VDwg1wo0AtmxHp1wtiHQt6kfVzqrLag-FyrhJSX1Suc-w_56yVQPsLfndT57n9KLPVZ-PMVtsUAKpA3TZ6M.png?r=72f";
 
-export const API_OPTIONS = {
-  method: "GET",
+export const API_OPTIONS={
+  method: 'GET',
   headers: {
-    accept: "application/json",
-    Authorization:
-      "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1YzM4NjhhMmUxNjM3ZTIzMjQzMjhiMWE2OGI2MjVmYiIsInN1YiI6IjY1MDQ1YzI2ZWEzN2UwMDExZDA5MjVhMiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.BdNt00yQLWzRIj9_WrOUKs_JpwD3xfK4NG-NbN9bSJs",
+    accept: 'application/json',
+    Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1YzM4NjhhMmUxNjM3ZTIzMjQzMjhiMWE2OGI2MjVmYiIsInN1YiI6IjY1MDQ1YzI2ZWEzN2UwMDExZDA5MjVhMiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.BdNt00yQLWzRIj9_WrOUKs_JpwD3xfK4NG-NbN9bSJs',
   },
 };
+
 
 export const IMG_CDN_URL = "https://image.tmdb.org/t/p/w500";
 
@@ -25,4 +27,4 @@ export const SUPPORTED_LANGUAGE = [
 ];
 
 
-export const KEY_FOR_DATA="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";
+export const OPEN_AI_KEY =process.env.REACT_APP_OPEN_AI_KEY;

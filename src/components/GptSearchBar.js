@@ -5,11 +5,12 @@ import openai from "../utils/openai";
 import { API_OPTIONS } from "../utils/constants";
 import { addGptMovieResult } from "../utils/gptSearchSlice";
 
+
 const GptSearchBar = () => {
   const dispatch=useDispatch()
   const langKey = useSelector((store) => store.config.lang);
 
-  const searchText = useRef();
+  const searchText = useRef(null);
 
   const searchMovieTMDB = async (movie) => {
     const data = await fetch(
@@ -23,7 +24,6 @@ const GptSearchBar = () => {
   };
 
   const handleGptSearchClick = async () => {
-    console.log(searchText.current.value);
     //make an api call to  GPT API and get movies result
     const gptQuery =
       "Act as movie recommendation system and suggest some movies for the query :" +
@@ -42,13 +42,12 @@ const GptSearchBar = () => {
 
     const promiseArray = gptMovies.map((movie) => searchMovieTMDB(movie));
     const tmdbResults= await Promise.all(promiseArray)
-    console.log(tmdbResults)
     dispatch(addGptMovieResult({movieNames:gptMovies,movieResults:tmdbResults}))
   };
   return (
-    <div className="pt-[10%] flex justify-center">
+    <div className="pt-[35%]  md:pt-[10%] flex justify-center">
       <form
-        className="w-1/2 bg-black grid grid-cols-12"
+        className="w-full md:w-1/2 bg-black grid grid-cols-12"
         onSubmit={(e) => e.preventDefault()}
       >
         <input
